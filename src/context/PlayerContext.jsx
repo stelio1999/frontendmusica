@@ -5,7 +5,8 @@ export const PlayerContext = createContext();
 
 const PlayerContextProvider = (props) => {
 
-    const url = 'http://localhost:3000';
+    //const url = 'http://localhost:3000';
+    const url = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
     const audioRef = useRef();
     const seekBar = useRef();
