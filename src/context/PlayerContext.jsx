@@ -69,14 +69,22 @@ const PlayerContextProvider = (props) => {
         totalTime: { second: 0, minute: 0 }
     });
 
-    const play = () => {
-        audioRef.current.play();
-        setPlayStatus(true);
+    const play = async () => {
+        try {
+            if (audioRef.current) {
+                await audioRef.current.play();
+                setPlayStatus(true);
+            }
+        } catch (error) {
+            console.log("Reprodução interrompida por nova ação:", error);
+        }
     }
 
     const pause = () => {
-        audioRef.current.pause();
-        setPlayStatus(false);
+        if (audioRef.current) {
+            audioRef.current.pause();
+            setPlayStatus(false);
+        }
     }
 
     const toggleLoop = () => {
@@ -111,31 +119,48 @@ const PlayerContextProvider = (props) => {
     }, [isShuffle, originalSongsData]);
 
     const playWithId = async (id) => {
-        songsData.map((item) => {
-            if (id === item.id) {
-                setTrack(item);
+        const selectedSong = songsData.find((item) => item.id === id);
+        if (selectedSong) {
+            setTrack(selectedSong);
+        }
+        try {
+            if (audioRef.current) {
+                await audioRef.current.play();
+                setPlayStatus(true);
             }
-        })
-        await audioRef.current.play();
-        setPlayStatus(true);
+        } catch (error) {
+            console.log("Interrompido ao trocar de música:", error);
+        }
     }
 
     const previusSong = async () => {
         songsData.map(async (item, index) => {
-            if (track.id === item.id && index > 0) {
-                await setTrack(songsData[index - 1]);
-                await audioRef.current.play();
-                setPlayStatus(true);
+            if (track && track.id === item.id && index > 0) {
+                setTrack(songsData[index - 1]);
+                try {
+                    if (audioRef.current) {
+                        await audioRef.current.play();
+                        setPlayStatus(true);
+                    }
+                } catch (error) {
+                    console.log("Interrompido na música anterior:", error);
+                }
             }
         })
     }
 
     const nextSong = async () => {
         songsData.map(async (item, index) => {
-            if (track.id === item.id && index < songsData.length - 1) {
-                await setTrack(songsData[index + 1]);
-                await audioRef.current.play();
-                setPlayStatus(true);
+            if (track && track.id === item.id && index < songsData.length - 1) {
+                setTrack(songsData[index + 1]);
+                try {
+                    if (audioRef.current) {
+                        await audioRef.current.play();
+                        setPlayStatus(true);
+                    }
+                } catch (error) {
+                    console.log("Interrompido na próxima música:", error);
+                }
             }
         })
     }
